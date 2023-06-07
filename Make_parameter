@@ -1,0 +1,26 @@
+
+from pyhive import hive
+import sys
+
+# Check if the necessary command-line arguments are provided
+if len(sys.argv) < 2:
+    print("Please provide the schema name as a command-line argument.")
+    sys.exit(1)
+
+# Retrieve the schema name from the command-line arguments
+schema_name = sys.argv[1]
+
+# Establish a connection to HiveServer2
+conn = hive.Connection(host='your_hiveserver2_host', port=10000, username='your_username')
+
+# Create a cursor object to execute queries
+cursor = conn.cursor()
+
+# Execute the queries from the HQL file with the dynamic schema name
+with open('/data/path/queries.hql', 'r') as f:
+    queries = f.read()
+    queries = queries.replace('schema_name', schema_name)
+    cursor.execute(queries)
+
+# Close the connection
+conn.close()
