@@ -1,0 +1,43 @@
+
+import monetdb.sql as msql
+import argparse
+
+def execute_copy_query(hostname, databasename, username, password, port):
+    # Copy statement
+    copy_statement = 'COPY SELECT * FROM "TABLE_A" INTO \'nz/export/TABLE_A.csv\' USING DELIMITERS \'|\', \'NULL AS\''
+
+    # Establishing connection
+    try:
+        connection = msql.connect(hostname=hostname, database=databasename, username=username, password=password, port=port)
+        cursor = connection.cursor()
+
+        # Executing the COPY statement
+        cursor.execute(copy_statement)
+        print("COPY statement executed successfully.")
+
+    except msql.Error as error:
+        print(f"Error connecting to MonetDB: {error}")
+
+    finally:
+        # Closing the connection
+        if connection:
+            connection.close()
+
+# Parsing command-line arguments
+parser = argparse.ArgumentParser(description='MonetDB COPY script')
+parser.add_argument('--hostname', required=True, help='MonetDB hostname')
+parser.add_argument('--databasename', required=True, help='MonetDB database name')
+parser.add_argument('--username', required=True, help='MonetDB username')
+parser.add_argument('--password', required=True, help='MonetDB password')
+parser.add_argument('--port', type=int, default=50012, help='MonetDB port number')
+
+args = parser.parse_args()
+
+# Example usage
+hostname = args.hostname
+databasename = args.databasename
+username = args.username
+password = args.password
+port = args.port
+
+execute_copy_query(hostname, databasename, username, password, port)
