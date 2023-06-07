@@ -1,0 +1,29 @@
+
+from pyhive import hive
+import sys
+
+# Check if the schema name is provided as a command-line argument
+if len(sys.argv) < 2:
+    print("Please provide the schema name as a command-line argument.")
+    sys.exit(1)
+
+# Retrieve the schema name from the command-line arguments
+schema_name = sys.argv[1]
+
+# Establish a connection to Hive
+conn = hive.Connection(host='your_hive_host', port=10000, username='your_username')
+
+# Create a cursor object to execute queries
+cursor = conn.cursor()
+
+# Execute the Hive queries with the dynamic schema name
+cursor.execute(f"COPY select * from table_a INTO '/nztoe/helix/table_a_123.csv' USING DELIMITERS '|', '\\n', '', NULL AS ''")
+cursor.execute(f"USE {schema_name}")
+cursor.execute("SET hive.execution.engine=tez")
+cursor.execute(f"CREATE TABLE IF NOT EXISTS table_a (postal_key INT, country STRING, custom_geo_population STRING) ROW FORMAT DELIMITED FIELDS TERMINATED BY '|'")
+cursor.execute(f"LOAD DATA LOCAL INPATH '/nztoe/helix/table_a_123.csv' INTO TABLE {schema_name}.table_a")
+cursor.execute("CREATE TABLE table_duniya AS SELECT * FROM table_rak")
+cursor.execute("CREATE TABLE table_duniya_new AS SELECT * FROM table_tele")
+
+# Close the connection
+conn.close()
