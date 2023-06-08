@@ -1,0 +1,39 @@
+
+import monetdb.sql as msql
+import sys
+
+def execute_copy_query(hostname, databasename, username, password, port, copy_file):
+    # Read the copy statement from the file
+    with open(copy_file, 'r') as file:
+        copy_statement = file.read()
+
+    # Establishing connection
+    try:
+        connection = msql.connect(hostname=hostname, database=databasename, username=username, password=password, port=port)
+        cursor = connection.cursor()
+
+        # Executing the COPY statement
+        cursor.execute(copy_statement)
+        print("COPY statement executed successfully.")
+
+    except msql.Error as error:
+        print(f"Error connecting to MonetDB: {error}")
+
+    finally:
+        # Closing the connection
+        if connection:
+            connection.close()
+
+# Example usage
+if len(sys.argv) != 7:
+    print("Usage: python script.py hostname databasename username password port copyfile")
+    sys.exit(1)
+
+hostname = sys.argv[1]
+databasename = sys.argv[2]
+username = sys.argv[3]
+password = sys.argv[4]
+port = int(sys.argv[5])
+copy_file = sys.argv[6]
+
+execute_copy_query(hostname, databasename, username, password, port, copy_file)
